@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Example</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+
+    .quiz-step {
+      margin-bottom: 30px;
+      display: none;
+    }
+
+    .quiz-step.active {
+      display: block;
+    }
+
+    .quiz-step p {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .quiz-result {
+      padding: 20px;
+      background-color: #dbeaf5;
+      border-left: 5px solid #3498db;
+      display: none;
+      font-size: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="quizForm">
+    <div class="quiz-step active" data-step="1">
+      <p>1. Как обычно начинаются ваши отношения?</p>
+      <label><input type="radio" name="q1" value="A" data-score="2"> A) Стремительно и страстно</label>
+      <label><input type="radio" name="q1" value="B" data-score="1"> B) Осторожно и долго</label>
+      <label><input type="radio" name="q1" value="C" data-score="0"> C) Незаметно втягиваюсь</label>
+    </div>
+
+    <div class="quiz-step" data-step="2">
+      <p>2. Как вы проявляете чувства?</p>
+      <label><input type="radio" name="q2" value="A" data-score="2"> A) Очень открыто</label>
+      <label><input type="radio" name="q2" value="B" data-score="1"> B) Сдержанно</label>
+      <label><input type="radio" name="q2" value="C" data-score="0"> C) Завишу от партнёра</label>
+    </div>
+
+    <div class="quiz-step" data-step="3">
+      <p>3. Что вы чаще чувствуете в отношениях?</p>
+      <label><input type="radio" name="q3" value="A" data-score="2"> A) Восторг и драйв</label>
+      <label><input type="radio" name="q3" value="B" data-score="1"> B) Напряжение и тревогу</label>
+      <label><input type="radio" name="q3" value="C" data-score="0"> C) Сомнения и неуверенность</label>
+    </div>
+  </form>
+
+  <div id="quizResult" class="quiz-result"></div>
+
+  <script>
+    const combinationTexts = {
+      AAA: 'Вы — страстный романтик. Ваш сценарий связан с идеализацией и сильными эмоциями.',
+      CCC: 'Вы склонны избегать близости и часто действуете из страха.',
+    };
+
+    const scoreBasedTexts = [
+      'Вы пока только начинаете осознавать свой сценарий.',
+      'Вы на пути к изменениям. Главное — не останавливаться.',
+      'Вы осознанны и готовы к зрелым отношениям.',
+    ];
+
+    const answers = {};
+    let currentStep = 1;
+
+    const steps = document.querySelectorAll('.quiz-step');
+    const resultBox = document.getElementById('quizResult');
+
+    document.querySelectorAll('.quiz-step input[type="radio"]').forEach(input => {
+      input.addEventListener('change', () => {
+        const question = input.name;
+        const value = input.value;
+        const score = parseInt(input.dataset.score);
+        answers[question] = { value, score };
+
+        const currentDiv = input.closest('.quiz-step');
+        currentDiv.classList.remove('active');
+
+        const nextDiv = document.querySelector(`.quiz-step[data-step="${++currentStep}"]`);
+        if (nextDiv) {
+          nextDiv.classList.add('active');
+        } else {
+          // All questions answered
+          const comboKey = `${answers.q1.value}${answers.q2.value}${answers.q3.value}`;
+          const totalScore = answers.q1.score + answers.q2.score + answers.q3.score;
+
+          let result;
+          if (combinationTexts[comboKey]) {
+            result = combinationTexts[comboKey];
+          } else {
+            if (totalScore <= 2) result = scoreBasedTexts[0];
+            else if (totalScore <= 4) result = scoreBasedTexts[1];
+            else result = scoreBasedTexts[2];
+          }
+
+          resultBox.textContent = result;
+          resultBox.style.display = 'block';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
